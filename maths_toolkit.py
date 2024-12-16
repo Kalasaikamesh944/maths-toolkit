@@ -1,82 +1,177 @@
-import math
+import numpy as np
+from sympy import symbols, Eq, solve, Matrix, sin, cos, tan, cot, sec, csc, simplify
 
-class MathsToolkit:
-    """A toolkit for intermediate-level Maths A and Maths B calculations."""
+class MathsSolver:
+    def __init__(self):
+        pass
 
-    # Algebra Functions
+    @staticmethod
+    def solve_linear_equations(equations, variables):
+        """
+        Solve a system of linear equations.
+        :param equations: List of equations as strings.
+        :param variables: List of variables as strings.
+        :return: Solution as a dictionary.
+        """
+        print(f"Solving linear equations: {equations} with variables: {variables}")
+        # Define variables as symbolic representations
+        vars = symbols(variables)
+        # Parse equations and convert to symbolic equality objects
+        eqs = [Eq(eval(eq.split('=')[0], {str(var): var for var in vars}), eval(eq.split('=')[1], {str(var): var for var in vars})) for eq in equations]
+        print(f"Parsed equations: {eqs}")
+        # Solve the equations
+        solution = solve(eqs, vars)
+        print(f"Solution: {solution}")
+        return solution
+
+    @staticmethod
+    def matrix_operations(matrix_a, matrix_b=None, operation="add"):
+        """
+        Perform matrix operations like addition, subtraction, multiplication.
+        :param matrix_a: First matrix as a 2D list.
+        :param matrix_b: Second matrix as a 2D list (optional).
+        :param operation: Operation to perform - "add", "subtract", "multiply".
+        :return: Resultant matrix as a 2D list.
+        """
+        print(f"Performing {operation} operation on matrices: {matrix_a} and {matrix_b}")
+        # Convert input matrices to sympy Matrix objects
+        mat_a = Matrix(matrix_a)
+        mat_b = Matrix(matrix_b) if matrix_b else None
+
+        # Perform the requested matrix operation
+        if operation == "add":
+            result = mat_a + mat_b
+        elif operation == "subtract":
+            result = mat_a - mat_b
+        elif operation == "multiply":
+            result = mat_a * mat_b
+        else:
+            raise ValueError("Invalid operation. Choose from 'add', 'subtract', 'multiply'.")
+        print(f"Resultant matrix: {result}")
+        return result.tolist()
+
+    @staticmethod
+    def find_locus(equation, x_var, y_var):
+        """
+        Find the locus of a given equation.
+        :param equation: Equation as a string.
+        :param x_var: Variable for x as a string.
+        :param y_var: Variable for y as a string.
+        :return: Rearranged equation representing the locus.
+        """
+        print(f"Finding locus for equation: {equation} with variables: {x_var}, {y_var}")
+        # Define variables as symbolic representations
+        x, y = symbols(f"{x_var} {y_var}")
+        # Parse the equation and convert to a symbolic equality object
+        eq = Eq(eval(equation.split('=')[0], {x_var: x, y_var: y}), eval(equation.split('=')[1], {x_var: x, y_var: y}))
+        print(f"Parsed equation: {eq}")
+        # Solve for the locus
+        locus = solve(eq, y)
+        print(f"Locus: {locus}")
+        return locus
+
+    @staticmethod
+    def matrix_determinant(matrix):
+        """
+        Calculate the determinant of a matrix.
+        :param matrix: Matrix as a 2D list.
+        :return: Determinant as a float or integer.
+        """
+        print(f"Calculating determinant of matrix: {matrix}")
+        # Convert input matrix to a sympy Matrix object
+        mat = Matrix(matrix)
+        # Compute the determinant
+        determinant = mat.det()
+        print(f"Determinant: {determinant}")
+        return determinant
+
     @staticmethod
     def solve_quadratic(a, b, c):
-        """Solve a quadratic equation ax^2 + bx + c = 0."""
-        discriminant = b**2 - 4*a*c
-        if discriminant < 0:
-            return "No Real Roots"
-        root1 = (-b + math.sqrt(discriminant)) / (2*a)
-        root2 = (-b - math.sqrt(discriminant)) / (2*a)
-        return root1, root2
-
-    # Trigonometry Functions
-    @staticmethod
-    def sin_deg(angle):
-        """Calculate sine of an angle in degrees."""
-        return math.sin(math.radians(angle))
-
-    @staticmethod
-    def cos_deg(angle):
-        """Calculate cosine of an angle in degrees."""
-        return math.cos(math.radians(angle))
-
-    # Calculus Functions
-    @staticmethod
-    def differentiate(poly_coeffs):
         """
-        Differentiate a polynomial.
-        poly_coeffs: List of coefficients [a_n, a_(n-1), ..., a_1, a_0].
-        Returns: List of differentiated coefficients.
+        Solve a quadratic equation ax^2 + bx + c = 0.
+        :param a: Coefficient of x^2.
+        :param b: Coefficient of x.
+        :param c: Constant term.
+        :return: Roots as a list.
         """
-        return [coeff * exp for exp, coeff in enumerate(poly_coeffs[::-1])][1:][::-1]
+        print(f"Solving quadratic equation: {a}x^2 + {b}x + {c} = 0")
+        # Define the variable as symbolic representation
+        x = symbols('x')
+        # Formulate the quadratic equation
+        eq = Eq(a * x**2 + b * x + c, 0)
+        print(f"Parsed equation: {eq}")
+        # Solve the equation
+        roots = solve(eq, x)
+        print(f"Roots: {roots}")
+        return roots
 
     @staticmethod
-    def integrate(poly_coeffs):
+    def solve_trigonometric(equation, variable):
         """
-        Integrate a polynomial.
-        poly_coeffs: List of coefficients [a_n, a_(n-1), ..., a_1, a_0].
-        Returns: List of integrated coefficients.
+        Solve trigonometric equations.
+        :param equation: Equation as a string.
+        :param variable: Variable as a string.
+        :return: Solutions as a list.
         """
-        return [coeff / (exp + 1) for exp, coeff in enumerate(poly_coeffs[::-1])][::-1] + [0]
-
-    # Statistics Functions
-    @staticmethod
-    def mean(numbers):
-        """Calculate the mean of a list of numbers."""
-        return sum(numbers) / len(numbers) if numbers else 0
-
-    @staticmethod
-    def variance(numbers):
-        """Calculate the variance of a list of numbers."""
-        mean_val = MathsToolkit.mean(numbers)
-        return sum((x - mean_val)**2 for x in numbers) / len(numbers) if numbers else 0
+        print(f"Solving trigonometric equation: {equation} for variable: {variable}")
+        # Define the variable as symbolic representation
+        var = symbols(variable)
+        # Parse the trigonometric equation and convert to a symbolic equality object
+        eq = Eq(eval(equation.split('=')[0], {"sin": sin, "cos": cos, "tan": tan, "cot": cot, "sec": sec, "csc": csc, variable: var}),
+                eval(equation.split('=')[1], {"sin": sin, "cos": cos, "tan": tan, "cot": cot, "sec": sec, "csc": csc, variable: var}))
+        print(f"Parsed equation: {eq}")
+        # Solve the trigonometric equation
+        solutions = solve(eq, var)
+        print(f"Solutions: {solutions}")
+        return solutions
 
     @staticmethod
-    def standard_deviation(numbers):
-        """Calculate the standard deviation of a list of numbers."""
-        return math.sqrt(MathsToolkit.variance(numbers))
+    def simplify_trigonometric(expression):
+        """
+        Simplify trigonometric expressions.
+        :param expression: Expression as a string.
+        :return: Simplified expression.
+        """
+        print(f"Simplifying trigonometric expression: {expression}")
+        # Define the variable 'x' for use in trigonometric expressions
+        x = symbols('x')
+        # Parse the trigonometric expression
+        expr = eval(expression, {"sin": sin, "cos": cos, "tan": tan, "cot": cot, "sec": sec, "csc": csc, "x": x})
+        print(f"Parsed expression: {expr}")
+        # Simplify the parsed expression
+        simplified_expr = simplify(expr)
+        print(f"Simplified expression: {simplified_expr}")
+        return simplified_expr
 
-    # Matrix Functions
-    @staticmethod
-    def matrix_add(matrix1, matrix2):
-        """Add two matrices element-wise."""
-        if len(matrix1) != len(matrix2) or any(len(row1) != len(row2) for row1, row2 in zip(matrix1, matrix2)):
-            raise ValueError("Matrices must have the same dimensions for addition.")
-        return [[val1 + val2 for val1, val2 in zip(row1, row2)] for row1, row2 in zip(matrix1, matrix2)]
+# Example Usage
+if __name__ == "__main__":
+    solver = MathsSolver()
 
-    @staticmethod
-    def matrix_multiply(matrix1, matrix2):
-        """Multiply two matrices."""
-        if len(matrix1[0]) != len(matrix2):
-            raise ValueError("Number of columns in the first matrix must equal number of rows in the second matrix.")
-        return [[sum(a * b for a, b in zip(row, col)) for col in zip(*matrix2)] for row in matrix1]
+    # Example: Solve linear equations
+    equations = ["2*x + y = 5", "x - y = 1"]
+    variables = "x y"
+    print("Linear Equations Solution:", solver.solve_linear_equations(equations, variables))
 
-    @staticmethod
-    def matrix_transpose(matrix):
-        """Transpose a matrix."""
-        return [list(row) for row in zip(*matrix)]
+    # Example: Matrix operations
+    mat_a = [[1, 2], [3, 4]]
+    mat_b = [[5, 6], [7, 8]]
+    print("Matrix Addition:", solver.matrix_operations(mat_a, mat_b, operation="add"))
+
+    # Example: Find locus
+    equation = "x**2 + y**2 - 25 = 0"
+    print("Locus:", solver.find_locus(equation, "x", "y"))
+
+    # Example: Determinant of a matrix
+    matrix = [[2, 3], [1, 4]]
+    print("Determinant:", solver.matrix_determinant(matrix))
+
+    # Example: Solve quadratic equation
+    print("Quadratic Roots:", solver.solve_quadratic(1, -3, 2))
+
+    # Example: Solve trigonometric equation
+    trig_eq = "sin(x) - 0.5 = 0"
+    print("Trigonometric Solution:", solver.solve_trigonometric(trig_eq, "x"))
+
+    # Example: Simplify trigonometric expression
+    trig_expr = "sin(x)**2 + cos(x)**2"
+    print("Simplified Expression:", solver.simplify_trigonometric(trig_expr))
